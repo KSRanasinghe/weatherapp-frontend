@@ -5,6 +5,7 @@ import type { CityComfortResult } from "@/types/CityComfortResult";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
 
 function Dashboard() {
   const { isAuthenticated, isLoading, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
@@ -18,7 +19,7 @@ function Dashboard() {
         },
       }).then((token) => {
         axios
-          .get("http://localhost:8080/api/weather-all",{
+          .get("http://localhost:8080/api/weather-all", {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((res) => setCities(res.data))
@@ -31,14 +32,14 @@ function Dashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h1 className="text-2xl font-bold">Weather Comfort Ranking</h1>
-        <button
-          onClick={() => loginWithRedirect()}
-          className="px-4 py-2 bg-black text-white rounded"
-        >
+      <div className="flex flex-col items-center justify-center h-screen p-4 bg-cover bg-center bg-[url('bg-img.webp')] bg-black/40 bg-blend-multiply">
+        <h3 className="text-lg md:text-3xl font-semibold pb-1 text-white">Welcome To</h3>
+        <h1 className="text-2xl md:text-4xl 2xl:text-6xl font-bold pb-2 text-white">Weather Comfort Ranking</h1>
+        <p className="w-full md:text-lg text-center md:w-4/5 2xl:w-2/5 text-white mb-3">Discover the most comfortable cities to live and travel in. We evaluate real-time weather metrics—including temperature, humidity, and wind speed—to calculate an overall comfort score and rank cities based on accurate, live data.</p>
+        <Button className="rounded-full px-6 py-5 text-xl bg-cyan-500 hover:bg-cyan-600 transition-all"
+          onClick={() => loginWithRedirect()}>
           Log In
-        </button>
+        </Button>
       </div>
     );
   }
@@ -46,8 +47,8 @@ function Dashboard() {
   return (
     <>
       <header className="flex items-center h-16 border-b p-4 justify-end gap-4">
-        <Sun size={18} />
-        <Button variant="outline" onClick={() => logout()}>
+        <ModeToggle />
+        <Button variant="destructive" onClick={() => logout()}>
           <LogOut size={18} data-icon="inline-start" />
           Log Out
         </Button>
@@ -55,7 +56,7 @@ function Dashboard() {
       <main className="max-w-full p-4 md:max-w-7xl mx-auto">
         <div className="flex flex-col items-center pt-6 mb-6">
           <h3 className="text-lg md:text-2xl font-semibold pb-1">Welcome To</h3>
-          <h1 className="text-2xl md:text-4xl font-bold pb-2 text-blue-400">Weather Comfort Ranking</h1>
+          <h1 className="text-2xl md:text-4xl font-bold pb-2 text-cyan-500">Weather Comfort Ranking</h1>
           <p className="w-full md:text-lg text-center md:w-4/5">Discover the most comfortable cities to live and travel in. We evaluate real-time weather metrics—including temperature, humidity, and wind speed—to calculate an overall comfort score and rank cities based on accurate, live data.</p>
         </div>
         <Table className="border">
@@ -69,15 +70,21 @@ function Dashboard() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cities.map((city) => (
-              <TableRow key={city.cityId}>
-                <TableCell className="text-center border-e">{city.rank}</TableCell>
-                <TableCell className="text-center border-e">{city.cityName}</TableCell>
-                <TableCell className="text-center border-e">{city.description}</TableCell>
-                <TableCell className="text-center border-e">{city.temp}</TableCell>
-                <TableCell className="text-center border-e">{city.comfortScore}</TableCell>
+            {cities.length === 0 ? (
+              <TableRow>
+                <TableCell className="border-r border-border text-center text-gray-500" colSpan={5}>Fetching latest weather data...</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              cities.map((city) => (
+                <TableRow key={city.rank}>
+                  <TableCell className="text-center border-e">{city.rank}</TableCell>
+                  <TableCell className="text-center border-e">{city.cityName}</TableCell>
+                  <TableCell className="text-center border-e">{city.description}</TableCell>
+                  <TableCell className="text-center border-e">{city.temp}</TableCell>
+                  <TableCell className="text-center border-e">{city.comfortScore}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </main>
