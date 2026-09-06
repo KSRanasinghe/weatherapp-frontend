@@ -9,7 +9,12 @@ createRoot(document.getElementById('root')!).render(
     <Auth0Provider
       domain="dev-edv0oizi1y2hsdb8.us.auth0.com"
       clientId="yfQi23242B2nsDlQEOzXP89Ff30ydJUV"
-      authorizationParams={{ redirect_uri: window.location.origin }}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: "https://weatherapp-api",
+      }}
+      cacheLocation="localstorage"
+      useRefreshTokens={true}
     >
       <App />
     </Auth0Provider>

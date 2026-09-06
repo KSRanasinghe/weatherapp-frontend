@@ -7,17 +7,25 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "@/components/ui/button";
 
 function Dashboard() {
-  const { isAuthenticated, isLoading, loginWithRedirect, logout, user } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
   const [cities, setCities] = useState<CityComfortResult[]>([]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      axios
-        .get<CityComfortResult[]>("http://localhost:8080/api/weather-all")
-        .then((res) => setCities(res.data))
-        .catch((err) => console.error("Failed to fetch weather data:", err));
+      getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://weatherapp-api",
+        },
+      }).then((token) => {
+        axios
+          .get("http://localhost:8080/api/weather-all",{
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((res) => setCities(res.data))
+          .catch((err) => console.error("Failed to fetch weather data:", err));
+      })
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   if (isLoading) return <div>Loading...</div>
 
